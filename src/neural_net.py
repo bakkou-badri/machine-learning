@@ -2,6 +2,12 @@ import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
 class NeuralNet:
+    """ NeuralNet class
+    An implementation of a multilayered artificial neural network
+    for multiclass data classification. The dimension of first (input)
+    layer MUST match the dimension of the data sample. The dimension
+    of the last layer must match the number of classes (labels).
+    """
 
     def __init__(self, learning_rate, network_shape):
         self.learning_rate = learning_rate
@@ -86,7 +92,16 @@ class NeuralNet:
 
 def main():
     learning_rate = 0.01
+
+    # Define network shape as follows:
+    #  * input layer matches the data dimension (784 pixels per image).
+    #  * two hidden layer contains 256 neurons each.
+    #  * last layer contains 10 neurons which is also the number of classes.
+    # Note: while the dimension of the first and the last layer must match
+    # dataset parameters, the number of hidden layers and the number of neurons
+    # in these layers can be customised and will affect the classification
     network_shape = (784, 256, 256, 10)
+    
     mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
     nn = NeuralNet(learning_rate, network_shape)
