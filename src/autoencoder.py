@@ -5,12 +5,13 @@ class Autoencoder:
     """ Autoencoder class
     Symetric neural network reconstructing X' from X.
     """
-    def __init__(self, learning_rate, network_shape):
+    def __init__(self, learning_rate, network_shape, session):
         if len(network_shape) != 3 or network_shape[0] != network_shape[-1]:
             print "Invalid shape %s" % (network_shape)
             print "Autoencoder must be a symetric 3-layered network"
             print "Exiting!"
             exit(-1)
+        self.session = session
         self.display_step = 100
         self.learning_rate = learning_rate
         self.network_shape = network_shape
@@ -27,19 +28,19 @@ class Autoencoder:
         # Define loss J and optimizer
         self.J = tf.reduce_mean(tf.pow(self.y - self.y_, 2))
         self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.J)
+        tf.initialize_all_variables().run(session=self.session)
 
     def train(self, max_iter, data):
         """ Trains the autoencoder
         """
-        # Start interactive tensorflow session
-        sess = tf.InteractiveSession()
-        tf.initialize_all_variables().run()
-
         for i in range(max_iter):
             batch = data.train.next_batch(50)
-            self.optimizer.run({self.x: batch[0], self.y_: batch[0]})
+            self.optimizer.run({self.x: batch[0], self.y_: batch[0]},
+                               session=self.session)
             if i % self.display_step == 0:
-                print "Iteration: %s, J: %s" % (i, self.J.eval({self.x: batch[0], self.y_: batch[0]}))
+                print "Iteration: %s, J: %s" % (i, self.J.eval({self.x: batch[0],
+                                                                self.y_: batch[0]},
+                                                session=self.session))
 
     def init_weights(self, shape):
         weights = {}
@@ -70,8 +71,10 @@ def main():
 
     mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
-    ae = Autoencoder(learning_rate, network_shape)
+    session = tf.Session()
+    ae = Autoencoder(learning_rate, network_shape, session)
     ae.train(max_iter, mnist)
+    session.close()
 
 if __name__ == "__main__":
     main()

@@ -9,7 +9,8 @@ class NeuralNet:
     of the last layer must match the number of classes (labels).
     """
 
-    def __init__(self, learning_rate, network_shape):
+    def __init__(self, learning_rate, network_shape, session):
+        self.session = session
         self.learning_rate = learning_rate
         self.network_shape = network_shape
         self.weights = self.init_weights(network_shape)
@@ -29,23 +30,24 @@ class NeuralNet:
         # Define accuracy calculation
         self.correct_prediction = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
+        tf.initialize_all_variables().run(session=self.session)
 
     def train(self, max_iter, data_set):
         """ Trains the network
         """
-        # Start tensorflow session and init variables
-        sess = tf.InteractiveSession()
-        tf.initialize_all_variables().run()
 
         for i in range(max_iter):
             batch = data_set.train.next_batch(50)
-            self.optimizer.run({self.x: batch[0], self.y_: batch[1]})
+            self.optimizer.run({self.x: batch[0], self.y_: batch[1]},
+                               session=self.session)
             if i % 10 == 0:
                 print("Iteration: %s, Accuracy (ts): %s, Accuracy (vs): %s" %
                       (i, self.accuracy.eval({self.x: batch[0],
-                                              self.y_: batch[1]}),
+                                              self.y_: batch[1]},
+                                              session=self.session),
                        self.accuracy.eval({self.x: data_set.test.images,
-                                           self.y_: data_set.test.labels})))
+                                           self.y_: data_set.test.labels},
+                                           session=self.session)))
 
     def init_weights(self, shape):
         """ Randomly initializes weight matrices.
@@ -104,8 +106,10 @@ def main():
     
     mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
-    nn = NeuralNet(learning_rate, network_shape)
+    session = tf.Session()
+    nn = NeuralNet(learning_rate, network_shape, session)
     nn.train(20000, mnist)
+    session.close()
 
 if __name__ == "__main__":
     main()

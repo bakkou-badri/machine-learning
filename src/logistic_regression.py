@@ -6,12 +6,12 @@ class LogReg:
     An implemetation of logistic regression for multiclass data classification
     """
 
-    def __init__(self, learning_rate, shape):
+    def __init__(self, learning_rate, shape, session):
         if len(shape) != 2:
             print "Length of the data shape must be 2! (NO_FEATURES, NO_CLASSES)"
             print "Exiting!"
             exit(1)
-
+        self.session = session
         self.shape = shape
         self.display_step = 100
         self.learning_rate = learning_rate
@@ -35,22 +35,26 @@ class LogReg:
         self.correct_prediction = tf.equal(tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
 
+        # Start tensorflow session and init variables
+        #sess = tf.InteractiveSession()
+        tf.initialize_all_variables().run(session=self.session)
+
     def train(self, max_iter, data):
         """ Trains the model
         """
-        # Start tensorflow session and init variables
-        sess = tf.InteractiveSession()
-        tf.initialize_all_variables().run()
 
         for i in range(max_iter):
             batch = data.train.next_batch(50)
-            self.optimizer.run({self.x: batch[0], self.y_: batch[1]})
+            self.optimizer.run({self.x: batch[0], self.y_: batch[1]},
+                               session=self.session)
             if i % self.display_step == 0:
                 print("Iteration: %s, Accuracy (ts): %s, Accuracy (vs): %s" %
                       (i, self.accuracy.eval({self.x: batch[0],
-                                              self.y_: batch[1]}),
+                                              self.y_: batch[1]},
+                                              session=self.session),
                        self.accuracy.eval({self.x: data.test.images,
-                                      self.y_: data.test.labels})))
+                                           self.y_: data.test.labels},
+                                          session=self.session)))
 def main():
     learning_rate = 0.01
     max_iter = 10000
@@ -62,8 +66,10 @@ def main():
 
     mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
-    lr = LogReg(learning_rate, shape)
+    session = tf.Session()
+    lr = LogReg(learning_rate, shape, session)
     lr.train(max_iter, mnist)
+    session.close()
 
 if __name__ == "__main__":
     main()
