@@ -3,6 +3,7 @@
 This repo contains various machine learning algorithms implemented in python on top of TensorFlow.
 
 Here is the list of implemented algorithms:
+ * [Logistic Regression](./src/logistic_regression.py) - A logistic regression classifier implementation.
  * [Neural Network](./src/neural_net.py) - A simple customizable multilayered neural network implementation.
 
 ## Quickstart
