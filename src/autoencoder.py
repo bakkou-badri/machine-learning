@@ -1,16 +1,20 @@
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
+
 class Autoencoder:
     """ Autoencoder class
-    Symetric neural network reconstructing X' from X.
+    Symetric 3-layer neural network reconstructing X' from X.
     """
+
     def __init__(self, learning_rate, shape, session):
         if len(shape) != 3 or shape[0] != shape[-1]:
             print "Invalid shape %s" % (shape)
             print "Autoencoder must be a symetric 3-layered network"
             print "Exiting!"
             exit(-1)
+        print "Creating autoencoder"
+        print "Shape: %s" % str(shape)
         self.session = session
         self.display_step = 100
         self.learning_rate = learning_rate
@@ -27,7 +31,8 @@ class Autoencoder:
 
         # Define loss J and optimizer
         self.J = tf.reduce_mean(tf.pow(self.y - self.y_, 2))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.J)
+        self.optimizer = tf.train.AdamOptimizer(
+            learning_rate=learning_rate).minimize(self.J)
         tf.initialize_all_variables().run(session=self.session)
 
     def train(self, max_iter, data):
@@ -35,22 +40,30 @@ class Autoencoder:
         """
         for i in range(max_iter):
             batch = data.train.next_batch(50)
-            self.optimizer.run({self.x: batch[0], self.y_: batch[0]},
-                               session=self.session)
+            self.train_batch(batch)
             if i % self.display_step == 0:
                 print "Iteration: %s, J: %s" % (i, self.J.eval({self.x: batch[0],
                                                                 self.y_: batch[0]},
                                                 session=self.session))
+
+    def train_batch(self, batch):
+        """ Trains one iteration using one batch of data.
+        :param batch: a tuple containing (x, y)
+        """
+        self.optimizer.run({self.x: batch[0], self.y_: batch[0]},
+                           session=self.session)
+
     def init_weights(self):
         weights = {}
-        for i in range(len(self.shape)-1):
-            weights[i] = tf.Variable(tf.random_normal([self.shape[i], self.shape[i+1]]))
+        for i in range(len(self.shape) - 1):
+            weights[i] = tf.Variable(tf.random_normal(
+                [self.shape[i], self.shape[i + 1]]))
         return weights
 
     def init_biases(self):
         biases = {}
-        for i in range(len(self.shape)-1):
-            biases[i] = tf.Variable(tf.random_normal([self.shape[i+1]]))
+        for i in range(len(self.shape) - 1):
+            biases[i] = tf.Variable(tf.random_normal([self.shape[i + 1]]))
         return biases
 
     def feed_forward(self, layer_idx=-1):
@@ -69,10 +82,13 @@ class Autoencoder:
             layer_idx = len(self.shape) - 1
         for i in range(layer_idx):
             if l is None:
-                l = tf.nn.sigmoid(tf.add(tf.matmul(self.x, self.weights[i]), self.biases[i]))
+                l = tf.nn.sigmoid(
+                    tf.add(tf.matmul(self.x, self.weights[i]), self.biases[i]))
             else:
-                l = tf.nn.sigmoid(tf.add(tf.matmul(l, self.weights[i]), self.biases[i]))
+                # Don't use activation function on the output of the last layer
+                l = tf.add(tf.matmul(l, self.weights[i]), self.biases[i])
         return l
+
 
 def main():
     learning_rate = 0.01
