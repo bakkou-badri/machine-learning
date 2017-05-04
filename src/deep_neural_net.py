@@ -14,8 +14,8 @@ class DeepNeuralNet:
     """
 
     def __init__(self, learning_rate, shape, session):
-        print "Creating (Deep) Neural Net"
-        print "Shape: %s" % str(shape)
+        print("Creating (Deep) Neural Net")
+        print("Shape: %s" % str(shape))
         self.session = session
         self.learning_rate = learning_rate
         self.shape = shape

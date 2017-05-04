@@ -9,12 +9,12 @@ class Autoencoder:
 
     def __init__(self, learning_rate, shape, session):
         if len(shape) != 3 or shape[0] != shape[-1]:
-            print "Invalid shape %s" % (shape)
-            print "Autoencoder must be a symetric 3-layered network"
-            print "Exiting!"
+            print("Invalid shape %s" % (shape))
+            print("Autoencoder must be a symetric 3-layered network")
+            print("Exiting!")
             exit(-1)
-        print "Creating autoencoder"
-        print "Shape: %s" % str(shape)
+        print("Creating autoencoder")
+        print("Shape: %s" % str(shape))
         self.session = session
         self.display_step = 100
         self.learning_rate = learning_rate
@@ -42,9 +42,9 @@ class Autoencoder:
             batch = data.train.next_batch(50)
             self.train_batch(batch)
             if i % self.display_step == 0:
-                print "Iteration: %s, J: %s" % (i, self.J.eval({self.x: batch[0],
+                print("Iteration: %s, J: %s" % (i, self.J.eval({self.x: batch[0],
                                                                 self.y_: batch[0]},
-                                                session=self.session))
+                                                session=self.session)))
 
     def train_batch(self, batch):
         """ Trains one iteration using one batch of data.

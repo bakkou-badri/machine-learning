@@ -8,8 +8,8 @@ class LogReg:
 
     def __init__(self, learning_rate, shape, session):
         if len(shape) != 2:
-            print "Length of the data shape must be 2! (NO_FEATURES, NO_CLASSES)"
-            print "Exiting!"
+            print("Length of the data shape must be 2! (NO_FEATURES, NO_CLASSES)")
+            print("Exiting!")
             exit(1)
         self.session = session
         self.shape = shape
