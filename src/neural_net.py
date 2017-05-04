@@ -26,7 +26,8 @@ class NeuralNet:
 
         # Define loss J and optimizer
         self.J = tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits(self.y, self.y_))
+            tf.nn.softmax_cross_entropy_with_logits(
+            logits=self.y, labels=self.y_))
         self.optimizer = tf.train.AdamOptimizer(
             learning_rate=learning_rate).minimize(self.J)
 
@@ -35,7 +36,7 @@ class NeuralNet:
             tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy = tf.reduce_mean(
             tf.cast(self.correct_prediction, tf.float32))
-        tf.initialize_all_variables().run(session=self.session)
+        tf.global_variables_initializer().run(session=self.session)
 
     def train(self, max_iter, data_set):
         """ Trains the network
@@ -110,7 +111,7 @@ def main():
     # in these layers can be customised and will affect the classification
     shape = (784, 256, 256, 10)
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+    mnist = input_data.read_data_sets("../data/mnist/", one_hot=True)
 
     session = tf.Session()
     nn = NeuralNet(learning_rate, shape, session)

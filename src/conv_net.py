@@ -30,7 +30,7 @@ class ConvNet:
         self.accuracy = tf.reduce_mean(
             tf.cast(self.correct_prediction, tf.float32))
 
-        tf.initialize_all_variables().run(session=self.session)
+        tf.global_variables_initializer().run(session=self.session)
 
     def train(self, max_iter, dataset):
         for i in range(max_iter):
@@ -105,7 +105,7 @@ def main():
              "fc": [7 * 7 * 128, 1024],
              "out": [1024, 10]}
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+    mnist = input_data.read_data_sets("../data/mnist/", one_hot=True)
 
     # Define input image dimensions [width, height, channels]
     img_dims = [28, 28, 1]

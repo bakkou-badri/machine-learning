@@ -33,7 +33,7 @@ class Autoencoder:
         self.J = tf.reduce_mean(tf.pow(self.y - self.y_, 2))
         self.optimizer = tf.train.AdamOptimizer(
             learning_rate=learning_rate).minimize(self.J)
-        tf.initialize_all_variables().run(session=self.session)
+        tf.global_variables_initializer().run(session=self.session)
 
     def train(self, max_iter, data):
         """ Trains the autoencoder
@@ -96,7 +96,7 @@ def main():
 
     shape = (784, 128, 784)
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+    mnist = input_data.read_data_sets("../data/mnist/", one_hot=True)
 
     session = tf.Session()
     ae = Autoencoder(learning_rate, shape, session)

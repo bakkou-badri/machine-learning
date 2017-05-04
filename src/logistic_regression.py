@@ -37,7 +37,7 @@ class LogReg:
 
         # Start tensorflow session and init variables
         #sess = tf.InteractiveSession()
-        tf.initialize_all_variables().run(session=self.session)
+        tf.global_variables_initializer().run(session=self.session)
 
     def train(self, max_iter, data):
         """ Trains the model
@@ -64,7 +64,7 @@ def main():
     # The len(shape) for logistic regression MUST be 2!
     shape = (784, 10)
 
-    mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+    mnist = input_data.read_data_sets("../data/mnist/", one_hot=True)
 
     session = tf.Session()
     lr = LogReg(learning_rate, shape, session)
