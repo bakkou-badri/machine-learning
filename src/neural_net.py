@@ -28,22 +28,22 @@ class NeuralNet:
         self.J = tf.reduce_mean(
             tf.nn.softmax_cross_entropy_with_logits(
             logits=self.y, labels=self.y_))
-        self.J_summary = tf.summary.scalar('cross_entropy', self.J)
+        self.J_summary_train = tf.summary.scalar('cross_entropy_train', self.J)
+        self.J_summary_valid = tf.summary.scalar('cross_entropy_valid', self.J)
         """
         self.optimizer = tf.train.AdamOptimizer(
             learning_rate=learning_rate).minimize(self.J)
         """
-        """
         self.optimizer = tf.train.GradientDescentOptimizer(
             learning_rate=learning_rate).minimize(self.J)
-        """
         """
         self.optimizer = tf.train.MomentumOptimizer(
             learning_rate=learning_rate, momentum=0.9).minimize(self.J)
         """
+        """
         self.optimizer = tf.train.AdagradOptimizer(
             learning_rate=learning_rate).minimize(self.J)
-        
+        """
         # Define accuracy calculation
         self.correct_prediction = tf.equal(
             tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
@@ -52,7 +52,7 @@ class NeuralNet:
         self.train_summary = tf.summary.scalar('accuracy_train', self.accuracy)
         self.validation_summary = tf.summary.scalar('accuracy_validation', self.accuracy)
         #self.summary_op = tf.summary.merge_all()
-        self.writer = tf.summary.FileWriter("./logs/", session.graph)
+        self.writer = tf.summary.FileWriter("./logs/mlp/", session.graph)
         tf.global_variables_initializer().run(session=self.session)
 
     def train(self, max_iter, data_set):
@@ -61,11 +61,12 @@ class NeuralNet:
 
         for i in range(max_iter):
             batch = data_set.train.next_batch(50)
-            _, t_summary, j = self.session.run([self.optimizer, self.train_summary, self.J_summary], {self.x: batch[0], self.y_: batch[1]})
+            _, t_summary, j = self.session.run([self.optimizer, self.train_summary, self.J_summary_train], {self.x: batch[0], self.y_: batch[1]})
             self.writer.add_summary(t_summary, i)
             self.writer.add_summary(j, i)
-            _, v_summary = self.session.run([self.optimizer, self.validation_summary], {self.x: data_set.test.images, self.y_: data_set.test.labels})
+            v_summary, j_valid = self.session.run([self.validation_summary, self.J_summary_valid], {self.x: data_set.test.images, self.y_: data_set.test.labels})
             self.writer.add_summary(v_summary, i)
+            self.writer.add_summary(j_valid, i)
             """
             self.optimizer.run({self.x: batch[0], self.y_: batch[1]},
                                session=self.session)
@@ -139,7 +140,7 @@ def main():
 
     mnist = input_data.read_data_sets("../data/mnist/", one_hot=True)
 
-    session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+    session = tf.Session(config=tf.ConfigProto(log_device_placement=True, device_count = {'GPU': 0}))
     nn = NeuralNet(learning_rate, shape, session)
     nn.train(max_iter, mnist)
     session.close()
