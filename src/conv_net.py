@@ -110,7 +110,9 @@ def main():
     # Define input image dimensions [width, height, channels]
     img_dims = [28, 28, 1]
 
-    session = tf.Session()
+    config = tf.ConfigProto()
+    config.gpu_options.per_process_gpu_memory_fraction = 0.4
+    session = tf.Session(config=config)
     cnn = ConvNet(learning_rate, shape, session, img_dims)
     cnn.train(10000, mnist)
     session.close()
