@@ -26,12 +26,21 @@ class ConvNet:
                                                tf.log(self.y), reduction_indices=[1]))
         self.J_summary_train = tf.summary.scalar('error_train', self.J)
         self.J_summary_valid = tf.summary.scalar('error_valid', self.J)
-        """
+
         self.optimizer = tf.train.AdamOptimizer(learning_rate).minimize(self.J)
+        
         """
-
-        self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(self.J)
-
+        self.optimizer = tf.train.GradientDescentOptimizer(
+            learning_rate=learning_rate).minimize(self.J)
+        """
+        """
+        self.optimizer = tf.train.MomentumOptimizer(
+            learning_rate=learning_rate, momentum=0.9).minimize(self.J)
+        """
+        """
+        self.optimizer = tf.train.AdagradOptimizer(
+            learning_rate=learning_rate).minimize(self.J)
+        """
         self.correct_prediction = tf.equal(
             tf.argmax(self.y, 1), tf.argmax(self.y_, 1))
         self.accuracy = tf.reduce_mean(
@@ -130,11 +139,10 @@ def main():
     # Define input image dimensions [width, height, channels]
     img_dims = [28, 28, 1]
 
-    config = tf.ConfigProto()
+    #config = tf.ConfigProto()
     #config.gpu_options.per_process_gpu_memory_fraction = 0.4
-    #config.log_device_placement=True
-    #config.device_count = {'GPU': 0}
-    session = tf.Session(config=config)
+    #session = tf.Session(config=tf.ConfigProto(log_device_placement=True, device_count = {'GPU': 0}))
+    session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     cnn = ConvNet(learning_rate, shape, session, img_dims)
     cnn.train(10000, mnist)
     session.close()
