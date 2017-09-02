@@ -4,10 +4,10 @@ This repo contains various machine learning algorithms implemented in python on 
 
 Here is the list of implemented algorithms:
  * [Logistic Regression](./src/logistic_regression.py) - A logistic regression classifier implementation.
- * [Neural Network](./src/neural_net.py) - A simple customizable multilayered neural network implementation.
+ * [Neural Network](./src/mlp.py) - A simple customizable multilayered neural network implementation.
  * [Autoencoder](./src/autoencoder.py) - An autoencoder implementation. This can be used for pre-training deep neural networks.
  * [Deep Neural Network](./src/deep_neural_net.py) - A deep neural network implementation laveraging autoencoders for greedy layer-wise network pretraining.
- * [Convolutional Neural Network](./src/conv_net.py) - A convolutional neural network implementation.
+ * [Convolutional Neural Network](./src/cnn.py) - A convolutional neural network implementation.
 
 ## Quickstart
 
